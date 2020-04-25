@@ -8,54 +8,95 @@ class DeepFlow():
     A library which helps store the details of all the experiments performed 
     and take a look at the journey made so far
 
-    Attributes:
-        projectname (str)   : name of the project (will be shown on the dashboard)
-        runmasterfile (str) : path/filename.csv of the master run file, new file will 
-                                will be created if specified file does not exist
-        parentID (int)      : ID of parent experiment from which changes are being made
-        description (str)   : a short description of changes made
-        benchmark (float)   : the benchmark score you are trying to beat
-        params (dict)       : a dictionary of params to be saved and shown on the dashboard
+    Attributes
+    ----------
+    projectname (str)   : (Required) name of the project (will be shown on the dashboard)
+
+    runmasterfile (str) : (Required) path/filename.csv of the master run file, new file
+        will be created if specified file does not exist
+
+    parentID (int)      : ID of parent experiment from which changes are being made,
+        Considered a run from scratch if no parentID provided
+    
+    description (str)   : (Required) a short description of changes made
+    
+    benchmark (float)   : (Optional) the benchmark score you are trying to beat
+    
+    params (dict)       : (Optional) a dictionary of params to be saved and shown on the dashboard
     """
-    def __init__(self, projectname, runmasterfile, **kwargs):
-        self.projectname = projectname
-        self.runmasterfile = runmasterfile
-        
-        if os.path.exists(runmasterfile):
-            self.dfrunmaster = pd.read_csv(runmasterfile)
-            expID = max(self.dfrunmaster.ExpID) + 1
-            if 'parentID' not in kwargs:
-                raise AssertionError("Please prove a parent expID")
-            parentID = kwargs['parentID']
-        else:
-            print(f"Starting your first experiment for {projectname}? , Best of Luck \U0001f600")
-            self.dfrunmaster = pd.DataFrame()
-            expID = 1
-            parentID = np.NaN
+    def __init__(self, **kwargs):
+        if 'projectname' not in kwargs:
+            raise AssertionError("Missing required parameter projectname")
+
+        if 'runmasterfile' not in kwargs:
+            raise AssertionError("Missing required parameter runmasterfile")    
+        self.runmasterfile = kwargs['runmasterfile']
+
+        if 'description' not in kwargs:
+            raise AssertionError("Missing required parameter description")
 
         self.runmastercols = [
-            'StartTime', 'EndTime', 'Duration', 'ParentID', 
-            'ExpID', 'Description', 'Score', 'ScoreType',
+            'ProjectName', 'ExpID', 'ParentID', 'Description',
+            'StartTime', 'EndTime', 'Duration', 'ScoreType', 'Score', 
             'ParentScore', 'ImprovementParent', 'Benchmark',
-            'ImprovementBenchmark', 'FeatureImp', 'params'
-        ]
+            'ImprovementBenchmark'
+        ] #, 'FeatureImp', 'params'
 
-    def start_run(self):
-        self.starttime = datetime.now()
+        self.dfcurrentrun = pd.DataFrame({
+            'ProjectName' : [kwargs['projectname']],
+            'StartTime' : [datetime.now()],
+            'Description' : [kwargs['description']]
+        })
+        
+        if os.path.exists(self.runmasterfile):
+            self.dfrunmaster = pd.read_csv(self.runmasterfile)
+            self.dfcurrentrun['ExpID'] = max(self.dfrunmaster.ExpID) + 1
+            if 'parentID' not in kwargs:
+                raise AssertionError("Please prove a parent expID")
+            self.dfcurrentrun['ParentID'] = kwargs['parentID']
+            self.dfcurrentrun['ParentScore'] = self.dfrunmaster.Score[self.dfrunmaster.ExpID == kwargs['parentID']].values[0]
+        else:
+            print(f"Starting your first experiment for {kwargs['projectname']}? , Best of Luck \U0001f600")
+            self.dfrunmaster = pd.DataFrame()
+            self.dfcurrentrun['ExpID'] = 1
+            self.dfcurrentrun['ParentID'] = np.NaN
+            self.dfcurrentrun['ParentScore'] = np.NaN
+
+        if 'benchmark' in kwargs:
+            self.dfcurrentrun['Benchmark'] = kwargs['benchmark']
+        else:
+            self.dfcurrentrun['Benchmark'] = np.NaN
 
     def end_run(self):
-        endtime = datetime.now()
-        duration = endtime - self.starttime
-        ### save runmaster file
+        self.dfcurrentrun['EndTime'] = datetime.now()
+        self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
 
-    def log_score(self, scoretype, score):
+        for col in ['StartTime', 'EndTime', 'Duration']:
+            self.dfcurrentrun[col] = self.dfcurrentrun[col].apply(lambda x : str(x)[:-7])
+        
+        self.dfrunmaster = pd.concat([self.dfrunmaster, self.dfcurrentrun], axis=0)
+        self.dfrunmaster = self.dfrunmaster[self.runmastercols]
+
+        self.dfrunmaster.to_csv(self.runmasterfile, index=False)
+
+    def log_score(self, scoretype, score, decimals=2):
         """
         logs the Score of the experiment
 
-        Parameters:
+        Parameters
+        ----------
             scoretype (str) : type of score eg. 'RMSE','SWMAPE', 'MAPE' 
+            score (float)   : score of the model
+            decimals (int)  : number of decimal places for score
         """
-        raise NotImplementedError
+        bench = self.dfcurrentrun['Benchmark'].values[0]
+        improveparent = round(score - self.dfcurrentrun['ParentScore'].values[0], decimals)
+        improvebench = round(score - bench, decimals)
+
+        self.dfcurrentrun['ScoreType'] = scoretype
+        self.dfcurrentrun['Score'] = round(score, decimals)
+        self.dfcurrentrun['ImprovementParent'] = improveparent
+        self.dfcurrentrun['ImprovementBenchmark'] = improvebench
 
     def log_imp(self, importance, path):
         """
