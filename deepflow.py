@@ -39,8 +39,8 @@ class DeepFlow():
             'ProjectName', 'ExpID', 'ParentID', 'Description',
             'StartTime', 'EndTime', 'Duration', 'ScoreType', 'Score', 
             'ParentScore', 'ImprovementParent', 'Benchmark',
-            'ImprovementBenchmark'
-        ] #, 'FeatureImp', 'params'
+            'ImprovementBenchmark', 'FeatureImp'
+        ] #, 'params'
 
         self.dfcurrentrun = pd.DataFrame({
             'ProjectName' : [kwargs['projectname']],
@@ -105,8 +105,18 @@ class DeepFlow():
         Parameters:
             importance (pandas.Dataframe) : feature importance dataframe with 
                                             columns 'Feature' and 'Importance' 
-            path (str) : path/filename.csv where importance dataframe will be saved
+            path (str) : path where importance dataframe will be saved
                          this path will be used to read the file and show importance
                          plot in the dashboard
+            the importances will be stored as a csv in path/impartance.csv
+            the code creates the path if it does not exist
         """
-        raise NotImplementedError
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        path = os.path.join(os.getcwd(), path, 'importance.csv')
+        self.dfcurrentrun['FeatureImp'] = path
+
+        print(f"Importance file saved in dir : {path}")
+
+        importance.to_csv(path, index=False)
