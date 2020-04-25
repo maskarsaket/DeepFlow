@@ -39,8 +39,8 @@ class DeepFlow():
             'ProjectName', 'ExpID', 'ParentID', 'Description',
             'StartTime', 'EndTime', 'Duration', 'ScoreType', 'Score', 
             'ParentScore', 'ImprovementParent', 'Benchmark',
-            'ImprovementBenchmark', 'FeatureImp'
-        ] #, 'params'
+            'ImprovementBenchmark', 'Params'
+        ] 
 
         self.dfcurrentrun = pd.DataFrame({
             'ProjectName' : [kwargs['projectname']],
@@ -67,9 +67,15 @@ class DeepFlow():
         else:
             self.dfcurrentrun['Benchmark'] = np.NaN
 
+        if 'params' in kwargs:
+            self.params = kwargs['params'] 
+        else:
+            self.params = dict()
+
     def end_run(self):
         self.dfcurrentrun['EndTime'] = datetime.now()
         self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
+        self.dfcurrentrun['Params'] = str(self.params)
 
         for col in ['StartTime', 'EndTime', 'Duration']:
             self.dfcurrentrun[col] = self.dfcurrentrun[col].apply(lambda x : str(x)[:-7])
@@ -115,8 +121,14 @@ class DeepFlow():
             os.makedirs(path)
 
         path = os.path.join(os.getcwd(), path, 'importance.csv')
-        self.dfcurrentrun['FeatureImp'] = path
+        self.params['FeatureImp'] = path
 
         print(f"Importance file saved in dir : {path}")
 
         importance.to_csv(path, index=False)
+
+    def log_param(self, param, value):
+        """
+        adds a param to the params dictionary saved in the run master 
+        """
+        self.params[param] = value
