@@ -5,7 +5,7 @@ import random
 import os
 
 projectname = "DeepFlow"
-runmaster = "runmaster.csv"
+runmaster = "data/runmaster.csv"
 bench = 90
 
 print("Description : ")

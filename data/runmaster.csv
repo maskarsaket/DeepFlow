@@ -1,0 +1,12 @@
+ProjectName,ExpID,ParentID,Description,StartTime,EndTime,Duration,ScoreType,Score,ParentScore,ImprovementParent,Benchmark,ImprovementBenchmark,Params
+DeepFlow,1,,First Experiment,2020-04-25 11:04:03,2020-04-25 11:04:09,0 days 00:00:06,RMSE,75.0,,,,,
+DeepFlow,2,1.0,Adding feature a,2020-04-25 11:05:07,2020-04-25 11:05:12,0 days 00:00:05,RMSE,77.0,75.0,2.0,,,
+DeepFlow,3,1.0,Added Benchmark,2020-04-25 11:10:49,2020-04-25 11:10:54,0 days 00:00:05,RMSE,89.0,75.0,14.0,90.0,-1.0,
+DeepFlow,4,3.0,column ordering,2020-04-25 11:14:43,2020-04-25 11:14:48,0 days 00:00:05,RMSE,88.0,89.0,-1.0,90.0,-2.0,
+DeepFlow,5,4.0,decimals,2020-04-25 11:23:30,2020-04-25 11:23:34,0 days 00:00:04,RMSE,91.0,88.0,3.0,90.0,1.0,
+DeepFlow,6,5.0,decimal check,2020-04-25 11:31:06,2020-04-25 11:31:14,0 days 00:00:07,RMSE,85.46,91.0,-5.54,90.0,-4.54,
+DeepFlow,7,5.0,test2,2020-04-25 12:56:31,2020-04-25 12:56:34,0 days 00:00:03,RMSE,55.0,91.0,-36.0,90.0,-35.0,
+DeepFlow,8,4.0,testing imp,2020-04-25 16:52:19,2020-04-25 16:52:23,0 days 00:00:04,RMSE,88.0,88.0,0.0,90.0,-2.0,
+DeepFlow,9,6.0,test imp2,2020-04-25 17:02:06,2020-04-25 17:02:10,0 days 00:00:03,RMSE,78.0,85.46,-7.46,90.0,-12.0,
+DeepFlow,10,2.0,test params,2020-04-25 17:09:46,2020-04-25 17:09:51,0 days 00:00:05,RMSE,88.0,77.0,11.0,90.0,-2.0,"{'model': 'LGB', 'Lagslist': '1,2,3', 'FeatureImp': '/home/maskarasaket/Documents/Deepflow/Runs/exp1/importance.csv'}"
+DeepFlow,11,8.0,testing new folder structure,2020-04-26 10:00:51,2020-04-26 10:00:55,0 days 00:00:03,RMSE,88.0,88.0,0.0,90.0,-2.0,"{'model': 'LGB', 'Lagslist': '1,2,3', 'FeatureImp': '/home/maskarasaket/Documents/DeepFlow/Runs/exp1/importance.csv'}"
