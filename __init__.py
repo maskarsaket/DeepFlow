@@ -78,6 +78,10 @@ class DeepFlow():
     def end_run(self):
         self.dfcurrentrun['EndTime'] = datetime.now()
         self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
+
+        for key in self.params:
+            self.params[key] = str(self.params[key])
+
         self.dfcurrentrun['Params'] = json.dumps(self.params)
 
         for col in ['StartTime', 'EndTime', 'Duration']:
