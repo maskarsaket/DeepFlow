@@ -1,7 +1,10 @@
-import pandas as pd
-import numpy as np
+import json
 import os
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
+
 
 class DeepFlow():
     """ 
@@ -75,7 +78,7 @@ class DeepFlow():
     def end_run(self):
         self.dfcurrentrun['EndTime'] = datetime.now()
         self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
-        self.dfcurrentrun['Params'] = str(self.params)
+        self.dfcurrentrun['Params'] = json.dumps(self.params)
 
         for col in ['StartTime', 'EndTime', 'Duration']:
             self.dfcurrentrun[col] = self.dfcurrentrun[col].apply(lambda x : str(x)[:-7])
