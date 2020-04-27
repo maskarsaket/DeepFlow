@@ -15,8 +15,8 @@ DATA_PATH = PATH.joinpath("../data").resolve()
 f = open(DATA_PATH.joinpath("aim.txt"), "r")
 aim = f.read()
 
-dfrunmaster = pd.read_csv(DATA_PATH.joinpath("testruns.csv"))
-dfkeylearnings = pd.read_csv(DATA_PATH.joinpath("keylearnings.csv"))
+dfrunmaster = pd.read_csv(DATA_PATH.joinpath("runmaster.csv"))
+dfjourneypoints = pd.read_csv(DATA_PATH.joinpath("journeypoints.csv"))
 dffeatobs = pd.read_csv(DATA_PATH.joinpath("featureobservations.csv"))
 
 projectname = dfrunmaster['ProjectName'].unique()[0]
@@ -38,8 +38,12 @@ for _, param in toprunparams.iteritems():
         topfeatures = pd.concat([topfeatures, imp], axis=0)
 
 if topfeatures.shape[0] != 0:
-    topfeatures = topfeatures.groupby('feature', as_index=False).agg({'importance':sum})
+    topfeatures['count'] = 1
+    topfeatures = topfeatures.groupby('feature', as_index=False).agg({'importance':sum, 'count':'sum'})
     topfeatures['importance'] = topfeatures['importance']/sum(topfeatures['importance'])
+    topfeatures = topfeatures.sort_values(by='importance', ascending=False).head(10)
+    topfeatures.sort_values(by='importance', ascending=True, inplace=True)
+
 
 def create_layout(app,projectname=projectname):
     # Page layouts
@@ -75,107 +79,79 @@ def create_layout(app,projectname=projectname):
                                         className="subtitle padded",
                                     ),
                                     dcc.Graph(
-                                        id="graph-1",
+                                        id="graph-2",
                                         figure={
                                             "data": [
-                                                go.Bar(
-                                                    x=[
-                                                        "1 Year",
-                                                        "3 Year",
-                                                        "5 Year",
-                                                        "10 Year",
-                                                        "41 Year",
-                                                    ],
-                                                    y=[
-                                                        "21.67",
-                                                        "11.26",
-                                                        "15.62",
-                                                        "8.37",
-                                                        "11.11",
-                                                    ],
-                                                    marker={
-                                                        "color": "#97151c",
-                                                        "line": {
-                                                            "color": "rgb(255, 255, 255)",
-                                                            "width": 2,
-                                                        },
-                                                    },
-                                                    name="Calibre Index Fund",
+                                                go.Scatter(
+                                                    x=dfrunmaster[dfrunmaster.ScoreType=='RMSE'].ExpID,
+                                                    y=dfrunmaster[dfrunmaster.ScoreType=='RMSE'].Score,
+                                                    # line={"color": "#97151c"},
+                                                    mode="lines",
+                                                    name="RMSE",
                                                 ),
-                                                go.Bar(
-                                                    x=[
-                                                        "1 Year",
-                                                        "3 Year",
-                                                        "5 Year",
-                                                        "10 Year",
-                                                        "41 Year",
-                                                    ],
-                                                    y=[
-                                                        "21.83",
-                                                        "11.41",
-                                                        "15.79",
-                                                        "8.50",
-                                                    ],
-                                                    marker={
-                                                        "color": "#dddddd",
-                                                        "line": {
-                                                            "color": "rgb(255, 255, 255)",
-                                                            "width": 2,
-                                                        },
-                                                    },
-                                                    name="S&P 500 Index",
-                                                ),
+                                                go.Scatter(
+                                                    x=dfrunmaster[dfrunmaster.ScoreType=='Average RMSE'].ExpID,
+                                                    y=dfrunmaster[dfrunmaster.ScoreType=='Average RMSE'].Score,
+                                                    # line={"color": "#97151c"},
+                                                    mode="lines",
+                                                    name="Average RMSE",
+                                                ),                                                
                                             ],
                                             "layout": go.Layout(
-                                                autosize=False,
-                                                bargap=0.35,
+                                                autosize=True,
+                                                title="",
                                                 font={"family": "Raleway", "size": 10},
                                                 height=200,
+                                                width=340,
                                                 hovermode="closest",
                                                 legend={
-                                                    "x": -0.0228945952895,
-                                                    "y": -0.189563896463,
+                                                    "x": -0.0277108433735,
+                                                    "y": -0.142606516291,
                                                     "orientation": "h",
-                                                    "yanchor": "top",
                                                 },
                                                 margin={
-                                                    "r": 0,
+                                                    "r": 20,
                                                     "t": 20,
-                                                    "b": 10,
-                                                    "l": 10,
+                                                    "b": 20,
+                                                    "l": 50,
                                                 },
                                                 showlegend=True,
-                                                title="",
-                                                width=330,
                                                 xaxis={
                                                     "autorange": True,
-                                                    "range": [-0.5, 4.5],
-                                                    "showline": True,
-                                                    "title": "",
-                                                    "type": "category",
-                                                },
-                                                yaxis={
-                                                    "autorange": True,
-                                                    "range": [0, 22.9789473684],
-                                                    "showgrid": True,
+                                                    "linecolor": "rgb(0, 0, 0)",
+                                                    "linewidth": 1,
+                                                    "showgrid": False,
                                                     "showline": True,
                                                     "title": "",
                                                     "type": "linear",
+                                                },
+                                                yaxis={
+                                                    "autorange": True,
+                                                    "gridcolor": "rgba(127, 127, 127, 0.2)",
+                                                    "mirror": False,
+                                                    "nticks": 4,
+                                                    "showgrid": True,
+                                                    "showline": True,
+                                                    "ticklen": 10,
+                                                    "ticks": "outside",
+                                                    "title": "Score",
+                                                    "type": "linear",
                                                     "zeroline": False,
+                                                    "zerolinewidth": 4,
                                                 },
                                             ),
                                         },
                                         config={"displayModeBar": False},
-                                    ),
+                                    ),                                    
                                 ],
                                 className="six columns",
                             ),
                             html.Div(
                                 [
                                     html.H6(
-                                        ["Key Learnings from the Project"], className="subtitle padded"
+                                        ["Key Points in the Journey"], className="subtitle padded"
                                     ),
-                                    html.Table(make_dash_table(dfkeylearnings)),
+                                    html.Table(make_dash_table(dfjourneypoints)),
                                 ],
                                 className="six columns",
                             ),
@@ -203,84 +179,59 @@ def create_layout(app,projectname=projectname):
                                         className="subtitle padded",
                                     ),
                                     dcc.Graph(
-                                        id="graph-2",
+                                        id="graph-1",
                                         figure={
                                             "data": [
-                                                go.Scatter(
-                                                    x=[
-                                                        "2008",
-                                                        "2009",
-                                                        "2010",
-                                                        "2011",
-                                                        "2012",
-                                                        "2013",
-                                                        "2014",
-                                                        "2015",
-                                                        "2016",
-                                                        "2017",
-                                                        "2018",
-                                                    ],
-                                                    y=[
-                                                        "10000",
-                                                        "7500",
-                                                        "9000",
-                                                        "10000",
-                                                        "10500",
-                                                        "11000",
-                                                        "14000",
-                                                        "18000",
-                                                        "19000",
-                                                        "20500",
-                                                        "24000",
-                                                    ],
-                                                    line={"color": "#97151c"},
-                                                    mode="lines",
-                                                    name="Calibre Index Fund Inv",
-                                                )
+                                                go.Bar(
+                                                    y=topfeatures['feature'],
+                                                    x=topfeatures['importance'],
+                                                    marker={
+                                                        # "color": "#97151c",
+                                                        "line": {
+                                                            "color": "rgb(255, 255, 255)",
+                                                            "width": 2,
+                                                        },
+                                                    },
+                                                    orientation='h',
+                                                    name="Importance",
+                                                ),
                                             ],
                                             "layout": go.Layout(
                                                 autosize=True,
-                                                title="",
+                                                bargap=0.35,
                                                 font={"family": "Raleway", "size": 10},
-                                                height=200,
-                                                width=340,
+                                                height=300,
                                                 hovermode="closest",
-                                                legend={
-                                                    "x": -0.0277108433735,
-                                                    "y": -0.142606516291,
-                                                    "orientation": "h",
-                                                },
+                                                # legend={
+                                                #     "y": -0.0228945952895,
+                                                #     "x": -0.189563896463,
+                                                #     "orientation": "h",
+                                                #     "yanchor": "top",
+                                                # },
                                                 margin={
-                                                    "r": 20,
+                                                    "r": 0,
                                                     "t": 20,
-                                                    "b": 20,
-                                                    "l": 50,
+                                                    "b": 30,
+                                                    "l": 120,
                                                 },
-                                                showlegend=True,
+                                                showlegend=False,
+                                                title="",
+                                                # width=330,
+                                                yaxis={
+                                                    "autorange": True,
+                                                    # "range": [-0.5, 4.5],
+                                                    "showline": True,
+                                                    "title": "",
+                                                    "type": "category",
+                                                },
                                                 xaxis={
                                                     "autorange": True,
-                                                    "linecolor": "rgb(0, 0, 0)",
-                                                    "linewidth": 1,
-                                                    "range": [2008, 2018],
-                                                    "showgrid": False,
+                                                    # "range": [0, 0.5],
+                                                    "showgrid": True,
                                                     "showline": True,
                                                     "title": "",
                                                     "type": "linear",
-                                                },
-                                                yaxis={
-                                                    "autorange": False,
-                                                    "gridcolor": "rgba(127, 127, 127, 0.2)",
-                                                    "mirror": False,
-                                                    "nticks": 4,
-                                                    "range": [0, 30000],
-                                                    "showgrid": True,
-                                                    "showline": True,
-                                                    "ticklen": 10,
-                                                    "ticks": "outside",
-                                                    "title": "$",
-                                                    "type": "linear",
                                                     "zeroline": False,
-                                                    "zerolinewidth": 4,
                                                 },
                                             ),
                                         },
