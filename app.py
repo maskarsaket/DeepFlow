@@ -4,7 +4,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from pages import (
-    overview
+    overview,
+    details
 )
 
 app = dash.Dash(
@@ -20,7 +21,10 @@ app.layout = html.Div(
 # Update page
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
-    return overview.create_layout(app)
+    if pathname == '/deepflow/details':
+        return details.create_layout(app)
+    else:
+        return overview.create_layout(app)
 
 
 if __name__ == "__main__":
