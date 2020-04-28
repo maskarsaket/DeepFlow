@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 
-from utils import Header, make_dash_table, create_feature_imp_plot, create_journey_plot
+from utils import Header, make_dash_table, create_feature_imp_plot, create_journey_plot_line
 
 import pandas as pd
 import numpy as np
@@ -92,7 +92,7 @@ def create_layout(app,projectname=projectname):
                                         "Journey Plot",
                                         className="subtitle padded",
                                     ),
-                                    create_journey_plot(dfrunmaster),                                    
+                                    create_journey_plot_line(dfrunmaster),                                    
                                 ],
                                 className="seven columns",
                             ),
