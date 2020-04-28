@@ -23,7 +23,10 @@ app.layout = html.Div(
 def display_page(pathname):
     if pathname == '/deepflow/details':
         return details.create_layout(app)
+    elif pathname == '/deepflow/fullview':
+        return tuple(overview.create_layout(app) if i==15 else details.create_layout(app, i) for i in range(15, 30))
     else:
+        # return overview.create_layout(app)
         return overview.create_layout(app)
 
 

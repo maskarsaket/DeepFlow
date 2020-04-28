@@ -33,7 +33,7 @@ def get_header(app, projectname):
                         [
                             dcc.Link(
                                 "Full View",
-                                href="/dash-financial-report/full-view",
+                                href="/deepflow/fullview",
                                 className="full-view-link",
                             )
                         ],
@@ -80,7 +80,7 @@ def make_dash_table(df):
 
 def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
     return  dcc.Graph(
-                id=graphid,
+                # id=graphid,
                 figure={
                     "data": [
                         go.Bar(
