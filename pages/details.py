@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 
-from utils import Header, make_dash_table
+from utils import Header, make_dash_table, create_feature_imp_plot
 
 import pandas as pd
 import pathlib
@@ -36,122 +36,34 @@ def create_layout(app, projectname=projectname, ExpID=23):
         topfeatures = imp.sort_values(by='importance', ascending=False).head(10)
         topfeatures.sort_values(by='importance', ascending=True, inplace=True)
 
-    # Page layouts
     return html.Div(
         [
             html.Div([Header(app, projectname)]),
-            # page 1
             html.Div(
                 [
-                    # Row 3
                     html.Div(
                         [
                             html.Div(
                                 [
-                                    html.H6(f"Experiment{ExpID} : "),
-                                    html.Br([]),
-                                    html.P(aim,
-                                        style={"color": "#ffffff"},
-                                        className="row",
-                                    ),
+                                    html.H6(f"Experiment{ExpID} : {aim}"),
                                 ],
                                 className="product",
                             )
                         ],
                         className="row",
                     ),
-                    # Row 4
                     html.Div(
-                        [html.Div(
-                                [
-                                    html.H6(
-                                        "Journey Plot",
-                                        className="subtitle padded",
-                                    ),
-                                    dcc.Graph(
-                                        id="graph-3",
-                                        figure={
-                                            "data": [
-                                                go.Scatter(
-                                                    x=dfrunmaster[dfrunmaster.ScoreType=='RMSE'].ExpID,
-                                                    y=dfrunmaster[dfrunmaster.ScoreType=='RMSE'].Score,
-                                                    # line={"color": "#97151c"},
-                                                    mode="lines",
-                                                    name="RMSE",
-                                                ),
-                                                go.Scatter(
-                                                    x=dfrunmaster[dfrunmaster.ScoreType=='Average RMSE'].ExpID,
-                                                    y=dfrunmaster[dfrunmaster.ScoreType=='Average RMSE'].Score,
-                                                    # line={"color": "#97151c"},
-                                                    mode="lines",
-                                                    name="Average RMSE",
-                                                ),                                                
-                                            ],
-                                            "layout": go.Layout(
-                                                autosize=True,
-                                                title="",
-                                                font={"family": "Raleway", "size": 10},
-                                                height=200,
-                                                width=340,
-                                                hovermode="closest",
-                                                legend={
-                                                    "x": -0.0277108433735,
-                                                    "y": -0.142606516291,
-                                                    "orientation": "h",
-                                                },
-                                                margin={
-                                                    "r": 20,
-                                                    "t": 20,
-                                                    "b": 20,
-                                                    "l": 50,
-                                                },
-                                                showlegend=True,
-                                                xaxis={
-                                                    "autorange": True,
-                                                    "linecolor": "rgb(0, 0, 0)",
-                                                    "linewidth": 1,
-                                                    "showgrid": False,
-                                                    "showline": True,
-                                                    "title": "",
-                                                    "type": "linear",
-                                                },
-                                                yaxis={
-                                                    "autorange": True,
-                                                    "gridcolor": "rgba(127, 127, 127, 0.2)",
-                                                    "mirror": False,
-                                                    "nticks": 4,
-                                                    "showgrid": True,
-                                                    "showline": True,
-                                                    "ticklen": 10,
-                                                    "ticks": "outside",
-                                                    "title": "Score",
-                                                    "type": "linear",
-                                                    "zeroline": False,
-                                                    "zerolinewidth": 4,
-                                                },
-                                            ),
-                                        },
-                                        config={"displayModeBar": False},
-                                    ),                                    
-                                ],
-                                className="six columns",
-                            ),
+                        [                            
                             html.Div(
                                 [
                                     html.H6(
-                                        ["Key Points in the Journey"], className="subtitle padded"
+                                        f"Top 10 Features",
+                                        className="subtitle padded",
                                     ),
-                                    html.Table(make_dash_table(dfjourneypoints)),
+                                    create_feature_imp_plot(topfeatures, "graph-4", topfeatures['importance'], "<b>Importance : %{x:.02f}")
                                 ],
-                                className="six columns",
+                                className="seven columns",
                             ),
-                        ],
-                        className="row",
-                        style={"margin-bottom": "35px"},
-                    ),
-                    # Row 5
-                    html.Div(
-                        [
                             html.Div(
                                 [
                                     html.H6(
@@ -160,75 +72,7 @@ def create_layout(app, projectname=projectname, ExpID=23):
                                     ),
                                     html.Table(make_dash_table(dffeatobs)),
                                 ],
-                                className="six columns",
-                            ),                            
-                            html.Div(
-                                [
-                                    html.H6(
-                                        f"Top 10 Features",
-                                        className="subtitle padded",
-                                    ),
-                                    dcc.Graph(
-                                        id="graph-4",
-                                        figure={
-                                            "data": [
-                                                go.Bar(
-                                                    y=topfeatures['feature'],
-                                                    x=topfeatures['importance'],
-                                                    marker={
-                                                        # "color": "#97151c",
-                                                        "line": {
-                                                            "color": "rgb(255, 255, 255)",
-                                                            "width": 2,
-                                                        },
-                                                    },
-                                                    orientation='h',
-                                                    name="Importance",
-                                                ),
-                                            ],
-                                            "layout": go.Layout(
-                                                autosize=True,
-                                                bargap=0.35,
-                                                font={"family": "Raleway", "size": 10},
-                                                height=300,
-                                                hovermode="closest",
-                                                # legend={
-                                                #     "y": -0.0228945952895,
-                                                #     "x": -0.189563896463,
-                                                #     "orientation": "h",
-                                                #     "yanchor": "top",
-                                                # },
-                                                margin={
-                                                    "r": 0,
-                                                    "t": 20,
-                                                    "b": 30,
-                                                    "l": 120,
-                                                },
-                                                showlegend=False,
-                                                title="",
-                                                # width=330,
-                                                yaxis={
-                                                    "autorange": True,
-                                                    # "range": [-0.5, 4.5],
-                                                    "showline": True,
-                                                    "title": "",
-                                                    "type": "category",
-                                                },
-                                                xaxis={
-                                                    "autorange": True,
-                                                    # "range": [0, 0.5],
-                                                    "showgrid": True,
-                                                    "showline": True,
-                                                    "title": "",
-                                                    "type": "linear",
-                                                    "zeroline": False,
-                                                },
-                                            ),
-                                        },
-                                        config={"displayModeBar": False},
-                                    ),
-                                ],
-                                className="six columns",
+                                className="five columns",
                             ),
                         ],
                         className="row ",
