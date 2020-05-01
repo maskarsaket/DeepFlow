@@ -40,8 +40,8 @@ class DeepFlow():
 
         self.runmastercols = [
             'ProjectName', 'ExpID', 'ParentID', 'Description',
-            'StartTime', 'EndTime', 'Duration', 'ScoreType', 'Score', 
-            'ParentScore', 'ImprovementParent', 'Benchmark',
+            'StartTime', 'EndTime', 'Duration', 'ScoreType', 'Metric',
+            'Score', 'ParentScore', 'ImprovementParent', 'Benchmark',
             'ImprovementBenchmark', 'Params'
         ] 
 
@@ -56,6 +56,8 @@ class DeepFlow():
             self.dfcurrentrun['ExpID'] = max(self.dfrunmaster.ExpID) + 1
             if 'parentID' not in kwargs:
                 raise AssertionError("Please prove a parent expID")
+            if int(kwargs['parentID']) not in self.dfrunmaster['ExpID'].values:
+                raise AssertionError("Parent ID not found in existing experiments")
             self.dfcurrentrun['ParentID'] = kwargs['parentID']
             self.dfcurrentrun['ParentScore'] = self.dfrunmaster.Score[self.dfrunmaster.ExpID == kwargs['parentID']].values[0]
         else:
@@ -92,21 +94,26 @@ class DeepFlow():
 
         self.dfrunmaster.to_csv(self.runmasterfile, index=False)
 
-    def log_score(self, scoretype, score, decimals=2):
+    def log_score(self, scoretype, metric, score, decimals=2):
         """
         logs the Score of the experiment
 
         Parameters
         ----------
-            scoretype (str) : type of score eg. 'RMSE','SWMAPE', 'MAPE' 
+            scoretype (str) : type of score eg. 'Error' or 'Accuracy'
+            metric (str)    : metric used to measure score eg. 'RMSE', 'SWMAPE', 'MAE', etc
             score (float)   : score of the model
             decimals (int)  : number of decimal places for score
         """
+        if scoretype.lower() not in ('error', 'accuracy'):
+            raise AssertionError(f"Expected 'Error' or 'Accuracy' for metric, '{scoretype}' was passed")
+
         bench = self.dfcurrentrun['Benchmark'].values[0]
         improveparent = round(score - self.dfcurrentrun['ParentScore'].values[0], decimals)
         improvebench = round(score - bench, decimals)
 
-        self.dfcurrentrun['ScoreType'] = scoretype
+        self.dfcurrentrun['ScoreType'] = scoretype.lower()
+        self.dfcurrentrun['Metric'] = metric.upper()
         self.dfcurrentrun['Score'] = round(score, decimals)
         self.dfcurrentrun['ImprovementParent'] = improveparent
         self.dfcurrentrun['ImprovementBenchmark'] = improvebench
