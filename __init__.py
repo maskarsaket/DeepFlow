@@ -118,28 +118,27 @@ class DeepFlow():
         self.dfcurrentrun['ImprovementParent'] = improveparent
         self.dfcurrentrun['ImprovementBenchmark'] = improvebench
 
-    def log_imp(self, importance, path):
+    def log_artefact(self, artefact, name):
         """
-        saves the feature importance daframe into the given path
+        Saves any artefact dataframe into Artefacts/exp_num folder as a csv, eg: feature importance,
+        helps in maintaining a clean folder structure for the project
 
         Parameters:
-            importance (pandas.Dataframe) : feature importance dataframe with 
-                                            columns 'Feature' and 'Importance' 
-            path (str) : path where importance dataframe will be saved
-                         this path will be used to read the file and show importance
-                         plot in the dashboard
-            the importances will be stored as a csv in path/impartance.csv
-            the code creates the path if it does not exist
+        -----------
+            artefact (pandas.Dataframe) : the dataframe to be saved, when saving feature importance, 
+            colnames should include 'Feature' and 'Importance'
+            name (str) : 'importance' when saving importance, custom name when storing anything else
         """
+        path = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]}")
+
         if not os.path.exists(path):
             os.makedirs(path)
 
-        path = os.path.join(os.getcwd(), path, 'importance.csv')
-        self.params['FeatureImp'] = path
+        self.params['Artefacts'] = path
+        
+        print(f"Saving artefact in dir : {path}/{name}.csv")
 
-        print(f"Importance file saved in dir : {path}")
-
-        importance.to_csv(path, index=False)
+        artefact.to_csv(f"{path}/{name}.csv", index=False)
 
     def log_param(self, param, value):
         """
