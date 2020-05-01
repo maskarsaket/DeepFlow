@@ -1,5 +1,5 @@
 import pandas as pd
-from DeepFlow import DeepFlow 
+from __init__ import DeepFlow 
 from time import sleep
 import random
 import os
@@ -30,7 +30,7 @@ flow = DeepFlow(
 
 print("RMSE : ")
 
-flow.log_score('RMSE', float(input()))
+flow.log_score('Accuracy', 'rmse', 94)
 sleep(2)
 
 imp = pd.DataFrame({
