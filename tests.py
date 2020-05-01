@@ -40,6 +40,12 @@ imp = pd.DataFrame({
 
 path = 'Runs/exp1'
 
-flow.log_imp(imp, 'Runs/exp1')
+flow.log_artefact(artefact=imp, name='importance')
+
+learnings = pd.DataFrame({
+    'Learnings':['test1', 'test2'],
+})
+
+flow.log_artefact(artefact=learnings, name='learnings')
 
 flow.end_run()
