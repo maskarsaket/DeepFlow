@@ -15,9 +15,6 @@ class DeepFlow():
     ----------
     projectname (str)   : (Required) name of the project (will be shown on the dashboard)
 
-    runmasterfile (str) : (Required) path/filename.csv of the master run file, new file
-        will be created if specified file does not exist
-
     parentID (int)      : ID of parent experiment from which changes are being made,
         Considered a run from scratch if no parentID provided
     
@@ -31,9 +28,7 @@ class DeepFlow():
         if 'projectname' not in kwargs:
             raise AssertionError("Missing required parameter projectname")
 
-        if 'runmasterfile' not in kwargs:
-            raise AssertionError("Missing required parameter runmasterfile")    
-        self.runmasterfile = kwargs['runmasterfile']
+        self.runmasterfile = os.path.join(os.getcwd(), "Artefacts/Overview/runmaster.csv")
 
         if 'description' not in kwargs:
             raise AssertionError("Missing required parameter description")
@@ -66,6 +61,29 @@ class DeepFlow():
             self.dfcurrentrun['ExpID'] = 1
             self.dfcurrentrun['ParentID'] = np.NaN
             self.dfcurrentrun['ParentScore'] = np.NaN
+            overviewpath = os.path.join(os.getcwd(), "Artefacts/Overview")
+            if not os.path.exists(overviewpath):
+                os.makedirs(overviewpath)
+            #### Create blank Learnings and Observations files
+            learnings = pd.DataFrame({
+                'Learnings' : []
+            })
+            learnings.to_csv(f"{overviewpath}/learnings.csv", index=False)
+            
+            observations = pd.DataFrame({
+                'Observations' : []
+            })
+            observations.to_csv(f"{overviewpath}/observations.csv", index=False)
+        
+        self.artefactpath = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]} - {kwargs['description']}")
+        if not os.path.exists(self.artefactpath):
+            os.makedirs(self.artefactpath)
+        
+        observations = pd.DataFrame({
+            'Observations' : []
+        })
+
+        observations.to_csv(f"{self.artefactpath}/observations.csv", index=False)
 
         if 'benchmark' in kwargs:
             self.dfcurrentrun['Benchmark'] = kwargs['benchmark']
@@ -93,6 +111,8 @@ class DeepFlow():
         self.dfrunmaster = self.dfrunmaster[self.runmastercols]
 
         self.dfrunmaster.to_csv(self.runmasterfile, index=False)
+
+        print("\nAll Done : Please make sure to keep the observations and learnings artefacts updated")
 
     def log_score(self, scoretype, metric, score, decimals=2):
         """
@@ -129,16 +149,11 @@ class DeepFlow():
             colnames should include 'Feature' and 'Importance'
             name (str) : 'importance' when saving importance, custom name when storing anything else
         """
-        path = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]}")
-
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        self.params['Artefacts'] = path
+        self.params['Artefacts'] = self.artefactpath
         
-        print(f"Saving artefact in dir : {path}/{name}.csv")
+        print(f"Saving artefact in dir : {self.artefactpath}/{name}.csv")
 
-        artefact.to_csv(f"{path}/{name}.csv", index=False)
+        artefact.to_csv(f"{self.artefactpath}/{name}.csv", index=False)
 
     def log_param(self, param, value):
         """
