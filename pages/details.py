@@ -16,25 +16,28 @@ dfrunmaster = pd.read_csv(DATA_PATH.joinpath("runmaster.csv"))
 projectname = dfrunmaster['ProjectName'].unique()[0]
 
 
-def create_layout(app, ExpID=23, projectname=projectname):
+def create_layout(app, ExpID, projectname=projectname):
     ### Read experiment specific learnings
     dfjourneypoints = pd.read_csv(DATA_PATH.joinpath("journeypoints.csv"))
     dffeatobs = pd.read_csv(DATA_PATH.joinpath("featureobservations.csv"))
 
-    param = dfrunmaster[dfrunmaster.ExpID==ExpID]['Params'].values[0]
-    param = ast.literal_eval(param)
+    try:
+        param = dfrunmaster[dfrunmaster.ExpID==ExpID]['Params'].values[0]
+        param = ast.literal_eval(param)
 
-    aim = dfrunmaster[dfrunmaster.ExpID==ExpID]['Description'].values[0]
+        aim = dfrunmaster[dfrunmaster.ExpID==ExpID]['Description'].values[0]
 
-    ### TODO : Sort values based on Acc/Error col in runmaster 
-    if 'FeatureImp' in param:
-        imp = pd.read_csv(param['FeatureImp'])
-        imp.columns = [i.lower() for i in imp.columns]
-        imp = imp.groupby('feature', as_index=False).agg({'importance':'sum'})
-        imp['importance'] = imp['importance']/sum(imp['importance'])
+        ### TODO : Sort values based on Acc/Error col in runmaster 
+        if 'FeatureImp' in param:
+            imp = pd.read_csv(param['FeatureImp'])
+            imp.columns = [i.lower() for i in imp.columns]
+            imp = imp.groupby('feature', as_index=False).agg({'importance':'sum'})
+            imp['importance'] = imp['importance']/sum(imp['importance'])
 
-        topfeatures = imp.sort_values(by='importance', ascending=False).head(10)
-        topfeatures.sort_values(by='importance', ascending=True, inplace=True)
+            topfeatures = imp.sort_values(by='importance', ascending=False).head(10)
+            topfeatures.sort_values(by='importance', ascending=True, inplace=True)
+    except:
+        return html.Div()
 
     return html.Div(
         [

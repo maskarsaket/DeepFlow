@@ -5,7 +5,7 @@ import plotly.express as px
 
 
 def Header(app, projectname):
-    return html.Div([get_header(app, projectname), html.Br([]), get_menu()])
+    return html.Div([get_header(app, projectname)])
 
 
 def get_header(app, projectname):
@@ -15,11 +15,7 @@ def get_header(app, projectname):
                 [
                     html.Br(),
                     html.Br(),
-                    html.Br(),                    
-                    # html.A(
-                    #     html.Button("Learn More", id="learn-more-button"),
-                    #     href="https://plot.ly/dash/pricing/",
-                    # ),
+                    html.Br()                   
                 ],
                 className="row",
             ),
@@ -32,8 +28,7 @@ def get_header(app, projectname):
                     html.Div(
                         [
                             dcc.Link(
-                                "Full View",
-                                href="/deepflow/fullview",
+                                "Best Score",
                                 className="full-view-link",
                             )
                         ],
