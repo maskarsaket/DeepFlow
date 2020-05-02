@@ -2,7 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 
-from utils import Header, make_dash_table, create_feature_imp_plot, create_journey_plot_line
+from utils import Header, make_dash_table, create_feature_imp_plot, create_journey_plot_line, make_unordered_list
 
 import pandas as pd
 import numpy as np
@@ -22,16 +22,16 @@ dfjourneypoints = pd.read_csv('../Artefacts/Overview/learnings.csv')
 dffeatobs = pd.read_csv('../Artefacts/Overview/observations.csv')
 
 # ### find series of changes used in best run
-# bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ExpID'].values[0]
-# parent = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ParentID'].values[0]
-# bestruns = [bestexp]
+bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ExpID'].values[0]
+parent = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ParentID'].values[0]
+bestruns = [bestexp]
 
-# while not np.isnan(parent):
-#     bestexp = dfrunmaster[dfrunmaster.ExpID==parent]['ExpID'].values[0]
-#     parent = dfrunmaster[dfrunmaster.ExpID==parent]['ParentID'].values[0]
-#     bestruns.append(bestexp)
+while not np.isnan(parent):
+    bestexp = dfrunmaster[dfrunmaster.ExpID==parent]['ExpID'].values[0]
+    parent = dfrunmaster[dfrunmaster.ExpID==parent]['ParentID'].values[0]
+    bestruns.append(bestexp)
 
-# dfrunmaster['Chosen'] = [1 if i in bestruns else 0 for i in dfrunmaster.ExpID]
+dfrunmaster['Chosen'] = [1 if i in bestruns else 0 for i in dfrunmaster.ExpID]
 
 projectname = dfrunmaster['ProjectName'].unique()[0]
 
@@ -65,17 +65,13 @@ def create_layout(app,projectname=projectname):
     return html.Div(
         [
             html.Div([Header(app, projectname)]),
-            # page 1
             html.Div(
                 [
-                    # Row 3
                     html.Div(
                         [
                             html.Div(
                                 [
-                                    html.H6("Objective : "),
-                                    html.Br([]),
-                                    html.P(aim,
+                                    html.H6(aim,
                                         style={"color": "#ffffff"},
                                         className="row",
                                     ),
@@ -85,7 +81,6 @@ def create_layout(app,projectname=projectname):
                         ],
                         className="row",
                     ),
-                    # Row 4
                     html.Div(
                         [html.Div(
                                 [
@@ -100,7 +95,8 @@ def create_layout(app,projectname=projectname):
                             html.Div(
                                 [
                                     html.H6(
-                                        ["Key Points in the Journey"], className="subtitle padded"
+                                        "Key Points in the Journey", 
+                                        className="subtitle padded"
                                     ),
                                     html.Table(make_dash_table(dfjourneypoints)),
                                 ],
@@ -108,9 +104,7 @@ def create_layout(app,projectname=projectname):
                             ),
                         ],
                         className="row",
-                        style={"margin-bottom": "35px"},
                     ),
-                    # Row 5
                     html.Div(
                         [
                             html.Div(
@@ -136,6 +130,30 @@ def create_layout(app,projectname=projectname):
                         ],
                         className="row ",
                     ),
+                    html.Div(
+                        [html.Div(
+                                [
+                                    html.H6(
+                                        "Road to best model",
+                                        className="subtitle padded",
+                                    ),
+                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==1]['Description'].values),
+                                ],
+                                className="seven columns",
+                            ),
+                            html.Div(
+                                [
+                                    html.H6(
+                                        "Changes that dint help", 
+                                        className="subtitle padded"
+                                    ),
+                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==0]['Description'].values),
+                                ],
+                                className="five columns",
+                            ),
+                        ],
+                        className="row",
+                    )
                 ],
                 className="sub_page",
             ),

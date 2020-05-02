@@ -22,12 +22,12 @@ def create_layout(app, ExpID, projectname=projectname):
 
     try:
         aim = dfrunmaster[dfrunmaster.ExpID==ExpID]['Description'].values[0]
-        exppath = f"../Artefacts/exp_{ExpID} - {aim}"
-        dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
-
         param = dfrunmaster[dfrunmaster.ExpID==ExpID]['Params'].values[0]
         param = ast.literal_eval(param)
 
+        exppath = param['Artefacts']
+        dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
+        
         if os.path.exists(f"{exppath}/importance.csv"):
             imp = pd.read_csv(f"{exppath}/importance.csv")
             imp.columns = [i.lower() for i in imp.columns]

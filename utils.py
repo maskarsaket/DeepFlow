@@ -73,6 +73,13 @@ def make_dash_table(df):
         table.append(html.Tr(html_row))
     return table
 
+def make_unordered_list(arr):
+    """ Return a dash definition of a bulleted list of an array """
+    return html.Div(
+        html.Ul([html.Li(x) for x in arr]),
+        className="padded"
+    )
+    
 def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
     return  dcc.Graph(
                 # id=graphid,
@@ -96,10 +103,10 @@ def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
                     "layout": go.Layout(
                         autosize=True,
                         bargap=0.35,
-                        font={"family": "Raleway", "size": 10},
+                        font={"family": "Raleway", "size": 11},
                         height=300,
                         hovermode="y",
-                        hoverlabel={"font_family": "Raleway", "font_size": 10},
+                        hoverlabel={"font_family": "Raleway", "font_size": 11},
                         margin={
                             "r": 0,
                             "t": 20,
@@ -151,11 +158,11 @@ def create_journey_plot_new(dfrunmaster):
         go.Layout(
                 autosize=True,
                 title="",
-                font={"family": "Raleway", "size": 10},
+                font={"family": "Raleway", "size": 11},
                 height=250,
                 # width=340,
                 hovermode="closest",
-                hoverlabel={"font_family": "Raleway", "font_size": 10},
+                hoverlabel={"font_family": "Raleway", "font_size": 11},
                 legend={
                     "x": -0.0277108433735,
                     "y": -0.142606516291,
@@ -205,14 +212,14 @@ def create_journey_plot_line(dfrunmaster):
     figure = go.Figure()
 
     ### Add traces for scores
-    for scoretype in dfrunmaster.ScoreType.unique():
+    for metric in dfrunmaster.Metric.unique():
         figure.add_traces([
             go.Scatter(
-                x=dfrunmaster[dfrunmaster.ScoreType==scoretype]['ExpID'],
-                y=dfrunmaster[dfrunmaster.ScoreType==scoretype]['Score'],
-                text=dfrunmaster[dfrunmaster.ScoreType==scoretype]['Description'],
+                x=dfrunmaster[dfrunmaster.Metric==metric]['ExpID'],
+                y=dfrunmaster[dfrunmaster.Metric==metric]['Score'],
+                text=dfrunmaster[dfrunmaster.Metric==metric]['Description'],
                 mode="lines+markers",
-                name=scoretype,
+                name=metric,
                 hovertemplate= "%{text}<br>" + "<b>Score : <b>%{y}<br>"
             )
         ])
@@ -232,11 +239,11 @@ def create_journey_plot_line(dfrunmaster):
         go.Layout(
             autosize=True,
             title="",
-            font={"family": "Raleway", "size": 10},
+            font={"family": "Raleway", "size": 11},
             height=250,
             # width=340,
             hovermode="closest",
-            hoverlabel={"font_family": "Raleway", "font_size": 10},
+            hoverlabel={"font_family": "Raleway", "font_size": 11},
             legend={
                 "x": -0.0277108433735,
                 "y": -0.142606516291,
