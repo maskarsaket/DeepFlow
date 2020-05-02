@@ -73,9 +73,7 @@ def create_layout(app,projectname=projectname):
                         [
                             html.Div(
                                 [
-                                    html.H6("Objective : "),
-                                    html.Br([]),
-                                    html.P(aim,
+                                    html.H6(aim,
                                         style={"color": "#ffffff"},
                                         className="row",
                                     ),

@@ -205,14 +205,14 @@ def create_journey_plot_line(dfrunmaster):
     figure = go.Figure()
 
     ### Add traces for scores
-    for scoretype in dfrunmaster.ScoreType.unique():
+    for metric in dfrunmaster.Metric.unique():
         figure.add_traces([
             go.Scatter(
-                x=dfrunmaster[dfrunmaster.ScoreType==scoretype]['ExpID'],
-                y=dfrunmaster[dfrunmaster.ScoreType==scoretype]['Score'],
-                text=dfrunmaster[dfrunmaster.ScoreType==scoretype]['Description'],
+                x=dfrunmaster[dfrunmaster.Metric==metric]['ExpID'],
+                y=dfrunmaster[dfrunmaster.Metric==metric]['Score'],
+                text=dfrunmaster[dfrunmaster.Metric==metric]['Description'],
                 mode="lines+markers",
-                name=scoretype,
+                name=metric,
                 hovertemplate= "%{text}<br>" + "<b>Score : <b>%{y}<br>"
             )
         ])
@@ -232,11 +232,11 @@ def create_journey_plot_line(dfrunmaster):
         go.Layout(
             autosize=True,
             title="",
-            font={"family": "Raleway", "size": 10},
+            font={"family": "Raleway", "size": 12},
             height=250,
             # width=340,
             hovermode="closest",
-            hoverlabel={"font_family": "Raleway", "font_size": 10},
+            hoverlabel={"font_family": "Raleway", "font_size": 12},
             legend={
                 "x": -0.0277108433735,
                 "y": -0.142606516291,
