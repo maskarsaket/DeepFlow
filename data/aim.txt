@@ -1,0 +1,5 @@
+The aim of this project is to predict the sales
+at monthly level for the month of 201511. It is the 
+final project of How to Win a Data Science Competition
+course in Coursera and also a kaggle competition.
+The metric for calculating score in this project is RMSE

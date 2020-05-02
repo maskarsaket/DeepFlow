@@ -14,29 +14,19 @@ class DeepFlow():
     Attributes
     ----------
     projectname (str)   : (Required) name of the project (will be shown on the dashboard)
-
-    runmasterfile (str) : (Required) path/filename.csv of the master run file, new file
-        will be created if specified file does not exist
+        
+    description (str)   : (Required) a short description of changes made
 
     parentID (int)      : ID of parent experiment from which changes are being made,
         Considered a run from scratch if no parentID provided
-    
-    description (str)   : (Required) a short description of changes made
     
     benchmark (float)   : (Optional) the benchmark score you are trying to beat
     
     params (dict)       : (Optional) a dictionary of params to be saved and shown on the dashboard
     """
-    def __init__(self, **kwargs):
-        if 'projectname' not in kwargs:
-            raise AssertionError("Missing required parameter projectname")
+    def __init__(self, projectname, description, **kwargs):
 
-        if 'runmasterfile' not in kwargs:
-            raise AssertionError("Missing required parameter runmasterfile")    
-        self.runmasterfile = kwargs['runmasterfile']
-
-        if 'description' not in kwargs:
-            raise AssertionError("Missing required parameter description")
+        self.runmasterfile = os.path.join(os.getcwd(), "Artefacts/Overview/runmaster.csv")
 
         self.runmastercols = [
             'ProjectName', 'ExpID', 'ParentID', 'Description',
@@ -46,9 +36,9 @@ class DeepFlow():
         ] 
 
         self.dfcurrentrun = pd.DataFrame({
-            'ProjectName' : [kwargs['projectname']],
+            'ProjectName' : [projectname],
             'StartTime' : [datetime.now()],
-            'Description' : [kwargs['description']]
+            'Description' : [description]
         })
         
         if os.path.exists(self.runmasterfile):
@@ -61,11 +51,34 @@ class DeepFlow():
             self.dfcurrentrun['ParentID'] = kwargs['parentID']
             self.dfcurrentrun['ParentScore'] = self.dfrunmaster.Score[self.dfrunmaster.ExpID == kwargs['parentID']].values[0]
         else:
-            print(f"Starting your first experiment for {kwargs['projectname']}? , Best of Luck \U0001f600")
+            print(f"Starting your first experiment for {projectname}? , Best of Luck \U0001f600")
             self.dfrunmaster = pd.DataFrame()
             self.dfcurrentrun['ExpID'] = 1
             self.dfcurrentrun['ParentID'] = np.NaN
             self.dfcurrentrun['ParentScore'] = np.NaN
+            overviewpath = os.path.join(os.getcwd(), "Artefacts/Overview")
+            if not os.path.exists(overviewpath):
+                os.makedirs(overviewpath)
+            #### Create blank Learnings and Observations files
+            learnings = pd.DataFrame({
+                'Learnings' : []
+            })
+            learnings.to_csv(f"{overviewpath}/learnings.csv", index=False)
+            
+            observations = pd.DataFrame({
+                'Observations' : []
+            })
+            observations.to_csv(f"{overviewpath}/observations.csv", index=False)
+        
+        self.artefactpath = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]} - {description}")
+        if not os.path.exists(self.artefactpath):
+            os.makedirs(self.artefactpath)
+        
+        observations = pd.DataFrame({
+            'Observations' : []
+        })
+
+        observations.to_csv(f"{self.artefactpath}/observations.csv", index=False)
 
         if 'benchmark' in kwargs:
             self.dfcurrentrun['Benchmark'] = kwargs['benchmark']
@@ -94,6 +107,8 @@ class DeepFlow():
 
         self.dfrunmaster.to_csv(self.runmasterfile, index=False)
 
+        print("\nAll Done : Please make sure to keep the observations and learnings artefacts updated")
+
     def log_score(self, scoretype, metric, score, decimals=2):
         """
         logs the Score of the experiment
@@ -118,28 +133,22 @@ class DeepFlow():
         self.dfcurrentrun['ImprovementParent'] = improveparent
         self.dfcurrentrun['ImprovementBenchmark'] = improvebench
 
-    def log_imp(self, importance, path):
+    def log_artefact(self, artefact, name):
         """
-        saves the feature importance daframe into the given path
+        Saves any artefact dataframe into Artefacts/exp_num folder as a csv, eg: feature importance,
+        helps in maintaining a clean folder structure for the project
 
         Parameters:
-            importance (pandas.Dataframe) : feature importance dataframe with 
-                                            columns 'Feature' and 'Importance' 
-            path (str) : path where importance dataframe will be saved
-                         this path will be used to read the file and show importance
-                         plot in the dashboard
-            the importances will be stored as a csv in path/impartance.csv
-            the code creates the path if it does not exist
+        -----------
+            artefact (pandas.Dataframe) : the dataframe to be saved, when saving feature importance, 
+            colnames should include 'Feature' and 'Importance'
+            name (str) : 'importance' when saving importance, custom name when storing anything else
         """
-        if not os.path.exists(path):
-            os.makedirs(path)
+        self.params['Artefacts'] = self.artefactpath
+        
+        print(f"Saving artefact in dir : {self.artefactpath}/{name}.csv")
 
-        path = os.path.join(os.getcwd(), path, 'importance.csv')
-        self.params['FeatureImp'] = path
-
-        print(f"Importance file saved in dir : {path}")
-
-        importance.to_csv(path, index=False)
+        artefact.to_csv(f"{self.artefactpath}/{name}.csv", index=False)
 
     def log_param(self, param, value):
         """
