@@ -7,29 +7,29 @@ from utils import Header, make_dash_table, create_feature_imp_plot
 import pandas as pd
 import pathlib
 import ast
+import os
 
 # get relative data folder
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("../data").resolve()
 
-dfrunmaster = pd.read_csv(DATA_PATH.joinpath("runmaster.csv"))
+dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
 projectname = dfrunmaster['ProjectName'].unique()[0]
 
 
 def create_layout(app, ExpID, projectname=projectname):
     ### Read experiment specific learnings
-    dfjourneypoints = pd.read_csv(DATA_PATH.joinpath("journeypoints.csv"))
-    dffeatobs = pd.read_csv(DATA_PATH.joinpath("featureobservations.csv"))
 
     try:
+        aim = dfrunmaster[dfrunmaster.ExpID==ExpID]['Description'].values[0]
+        exppath = f"../Artefacts/exp_{ExpID} - {aim}"
+        dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
+
         param = dfrunmaster[dfrunmaster.ExpID==ExpID]['Params'].values[0]
         param = ast.literal_eval(param)
 
-        aim = dfrunmaster[dfrunmaster.ExpID==ExpID]['Description'].values[0]
-
-        ### TODO : Sort values based on Acc/Error col in runmaster 
-        if 'FeatureImp' in param:
-            imp = pd.read_csv(param['FeatureImp'])
+        if os.path.exists(f"{exppath}/importance.csv"):
+            imp = pd.read_csv(f"{exppath}/importance.csv")
             imp.columns = [i.lower() for i in imp.columns]
             imp = imp.groupby('feature', as_index=False).agg({'importance':'sum'})
             imp['importance'] = imp['importance']/sum(imp['importance'])

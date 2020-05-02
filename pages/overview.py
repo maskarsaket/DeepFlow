@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import pathlib
 import ast
+import os
 
 # get relative data folder
 PATH = pathlib.Path(__file__).parent
@@ -16,35 +17,35 @@ DATA_PATH = PATH.joinpath("../data").resolve()
 f = open(DATA_PATH.joinpath("aim.txt"), "r")
 aim = f.read()
 
-dfrunmaster = pd.read_csv('data/runmaster.csv')#DATA_PATH.joinpath("runmaster.csv")
-dfjourneypoints = pd.read_csv(DATA_PATH.joinpath("journeypoints.csv"))
-dffeatobs = pd.read_csv(DATA_PATH.joinpath("featureobservations.csv"))
+dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
+dfjourneypoints = pd.read_csv('../Artefacts/Overview/learnings.csv')
+dffeatobs = pd.read_csv('../Artefacts/Overview/observations.csv')
 
-### find series of changes used in best run
-bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ExpID'].values[0]
-parent = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ParentID'].values[0]
-bestruns = [bestexp]
+# ### find series of changes used in best run
+# bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ExpID'].values[0]
+# parent = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.ScoreType=='Average RMSE')].Score))]['ParentID'].values[0]
+# bestruns = [bestexp]
 
-while not np.isnan(parent):
-    bestexp = dfrunmaster[dfrunmaster.ExpID==parent]['ExpID'].values[0]
-    parent = dfrunmaster[dfrunmaster.ExpID==parent]['ParentID'].values[0]
-    bestruns.append(bestexp)
+# while not np.isnan(parent):
+#     bestexp = dfrunmaster[dfrunmaster.ExpID==parent]['ExpID'].values[0]
+#     parent = dfrunmaster[dfrunmaster.ExpID==parent]['ParentID'].values[0]
+#     bestruns.append(bestexp)
 
-dfrunmaster['Chosen'] = [1 if i in bestruns else 0 for i in dfrunmaster.ExpID]
+# dfrunmaster['Chosen'] = [1 if i in bestruns else 0 for i in dfrunmaster.ExpID]
 
 projectname = dfrunmaster['ProjectName'].unique()[0]
 
 ### TODO : Sort values based on Acc/Error col in runmaster 
-topruns = dfrunmaster[dfrunmaster.ScoreType=='Average RMSE'].sort_values(by='Score').head(5)
+topruns = dfrunmaster.sort_values(by='Score').head(5)
 toprunparams = topruns['Params'].dropna()
 topfeatures = pd.DataFrame()
 featruns = 0
 
 for _, param in toprunparams.iteritems():
     param = ast.literal_eval(param)
-    if 'FeatureImp' in param:
+    if os.path.exists(f"{param['Artefacts']}/importance.csv"):
         featruns += 1
-        imp = pd.read_csv(param['FeatureImp'])
+        imp = pd.read_csv(f"{param['Artefacts']}/importance.csv")
         imp.columns = [i.lower() for i in imp.columns]
         imp = imp.groupby('feature', as_index=False).agg({'importance':'sum'})
         imp['importance'] = imp['importance']/sum(imp['importance'])

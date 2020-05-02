@@ -14,24 +14,19 @@ class DeepFlow():
     Attributes
     ----------
     projectname (str)   : (Required) name of the project (will be shown on the dashboard)
+        
+    description (str)   : (Required) a short description of changes made
 
     parentID (int)      : ID of parent experiment from which changes are being made,
         Considered a run from scratch if no parentID provided
-    
-    description (str)   : (Required) a short description of changes made
     
     benchmark (float)   : (Optional) the benchmark score you are trying to beat
     
     params (dict)       : (Optional) a dictionary of params to be saved and shown on the dashboard
     """
-    def __init__(self, **kwargs):
-        if 'projectname' not in kwargs:
-            raise AssertionError("Missing required parameter projectname")
+    def __init__(self, projectname, description, **kwargs):
 
         self.runmasterfile = os.path.join(os.getcwd(), "Artefacts/Overview/runmaster.csv")
-
-        if 'description' not in kwargs:
-            raise AssertionError("Missing required parameter description")
 
         self.runmastercols = [
             'ProjectName', 'ExpID', 'ParentID', 'Description',
