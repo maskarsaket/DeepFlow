@@ -36,9 +36,9 @@ class DeepFlow():
         ] 
 
         self.dfcurrentrun = pd.DataFrame({
-            'ProjectName' : [kwargs['projectname']],
+            'ProjectName' : [projectname],
             'StartTime' : [datetime.now()],
-            'Description' : [kwargs['description']]
+            'Description' : [description]
         })
         
         if os.path.exists(self.runmasterfile):
@@ -51,7 +51,7 @@ class DeepFlow():
             self.dfcurrentrun['ParentID'] = kwargs['parentID']
             self.dfcurrentrun['ParentScore'] = self.dfrunmaster.Score[self.dfrunmaster.ExpID == kwargs['parentID']].values[0]
         else:
-            print(f"Starting your first experiment for {kwargs['projectname']}? , Best of Luck \U0001f600")
+            print(f"Starting your first experiment for {projectname}? , Best of Luck \U0001f600")
             self.dfrunmaster = pd.DataFrame()
             self.dfcurrentrun['ExpID'] = 1
             self.dfcurrentrun['ParentID'] = np.NaN
@@ -70,7 +70,7 @@ class DeepFlow():
             })
             observations.to_csv(f"{overviewpath}/observations.csv", index=False)
         
-        self.artefactpath = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]} - {kwargs['description']}")
+        self.artefactpath = os.path.join(os.getcwd(), "Artefacts/", f"exp_{self.dfcurrentrun['ExpID'].values[0]} - {description}")
         if not os.path.exists(self.artefactpath):
             os.makedirs(self.artefactpath)
         
