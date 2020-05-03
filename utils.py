@@ -25,15 +25,10 @@ def get_header(app, projectname):
                         [html.H5(projectname)], 
                         className="seven columns main-title",
                     ),
-                    html.Div(
-                        [
-                            dcc.Link(
-                                "Best Score",
-                                className="full-view-link",
-                            )
-                        ],
-                        className="five columns",
-                    ),
+                    # html.Div(
+                    #     [html.H6("Add best score here")],
+                    #     className="five columns",
+                    # ),
                 ],
                 className="twelve columns",
                 style={"padding-left": "0"},
@@ -42,25 +37,6 @@ def get_header(app, projectname):
         className="row",
     )
     return header
-
-
-def get_menu():
-    menu = html.Div(
-        [
-            dcc.Link(
-                "Overview",
-                href="/deepflow/overview",
-                className="tab first",
-            ),
-            dcc.Link(
-                "Details",
-                href="/deepflow/details",
-                className="tab",
-            )
-        ],
-        className="row all-tabs",
-    )
-    return menu
 
 
 def make_dash_table(df):
