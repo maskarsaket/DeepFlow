@@ -18,8 +18,6 @@ f = open(DATA_PATH.joinpath("aim.txt"), "r")
 aim = f.read()
 
 dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
-dfjourneypoints = pd.read_csv('../Artefacts/Overview/learnings.csv')
-dffeatobs = pd.read_csv('../Artefacts/Overview/observations.csv')
 
 # ### find series of changes used in best run
 bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ExpID'].values[0]
@@ -95,10 +93,14 @@ def create_layout(app,projectname=projectname):
                             html.Div(
                                 [
                                     html.H6(
-                                        "Key Points in the Journey", 
+                                        "Key Takeaways", 
                                         className="subtitle padded"
                                     ),
-                                    html.Table(make_dash_table(dfjourneypoints)),
+                                    html.Div(id='table_learnings'),
+                                    html.Div([
+                                        dcc.Input(id='input_journey', type='text', placeholder='Enter new learnings'),  
+                                        html.Button('Add', id='submit_learning', n_clicks=0)
+                                    ],className="row")                     
                                 ],
                                 className="five columns",
                             ),
@@ -113,7 +115,11 @@ def create_layout(app,projectname=projectname):
                                         "Observations from Features",
                                         className="subtitle padded",
                                     ),
-                                    html.Table(make_dash_table(dffeatobs)),
+                                    html.Div(id='feature_observations'),                                    
+                                    html.Div([
+                                        dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),  
+                                        html.Button('Add', id='submit_observation', n_clicks=0)
+                                    ],className="row")
                                 ],
                                 className="five columns",
                             ),                            
