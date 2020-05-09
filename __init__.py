@@ -43,11 +43,18 @@ class DeepFlow():
         
         if os.path.exists(self.runmasterfile):
             self.dfrunmaster = pd.read_csv(self.runmasterfile)
+
+            if description.lower() in self.dfrunmaster['Description'].str.lower().values:
+                raise AssertionError("Experiment Description must be unique")
+            
             self.dfcurrentrun['ExpID'] = max(self.dfrunmaster.ExpID) + 1
+            
             if 'parentID' not in kwargs:
-                raise AssertionError("Please prove a parent expID")
+                raise AssertionError("Please provide a parent expID")
+            
             if int(kwargs['parentID']) not in self.dfrunmaster['ExpID'].values:
                 raise AssertionError("Parent ID not found in existing experiments")
+            
             self.dfcurrentrun['ParentID'] = kwargs['parentID']
             self.dfcurrentrun['ParentScore'] = self.dfrunmaster.Score[self.dfrunmaster.ExpID == kwargs['parentID']].values[0]
         else:
@@ -56,9 +63,12 @@ class DeepFlow():
             self.dfcurrentrun['ExpID'] = 1
             self.dfcurrentrun['ParentID'] = np.NaN
             self.dfcurrentrun['ParentScore'] = np.NaN
+            
             overviewpath = os.path.join(os.getcwd(), "Artefacts/Overview")
+            
             if not os.path.exists(overviewpath):
                 os.makedirs(overviewpath)
+            
             #### Create blank Learnings and Observations files
             learnings = pd.DataFrame({
                 'Learnings' : []
