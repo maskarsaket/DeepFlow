@@ -155,7 +155,14 @@ class DeepFlow():
         self._saverunmaster()
 
         if status in ("Completed", "Failed"):
-            self._end_run()
+            self.dfcurrentrun['EndTime'] = datetime.now()
+            self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
+            self._saverunmaster()
+
+            if status == 'Failed':
+                raise Exception(errormessage)
+
+            print("\nAll Done : Please make sure to keep the observations and learnings artefacts updated")
 
     def _saverunmaster(self):
         """
@@ -176,19 +183,6 @@ class DeepFlow():
 
         runmastersavefile.to_csv(self.runmasterfile, index=False)
 
-    def _end_run(self):
-        """
-        Helper function to end the run incase the run fails or completes successfully.
-        This function updates the EndTime, Duration and Params
-        and saves runmaster.csv file.
-        """
-
-        self.dfcurrentrun['EndTime'] = datetime.now()
-        self.dfcurrentrun['Duration'] = self.dfcurrentrun['EndTime'] - self.dfcurrentrun['StartTime']
-
-        self._saverunmaster()
-
-        print("\nAll Done : Please make sure to keep the observations and learnings artefacts updated")
 
     def log_score(self, scoretype, metric, score, decimals=2):
         """
