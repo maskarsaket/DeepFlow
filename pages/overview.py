@@ -1,8 +1,9 @@
 import dash_core_components as dcc
 import dash_html_components as html
+from dash_table import DataTable
 import plotly.graph_objs as go
 
-from utils import Header, make_dash_table, create_feature_imp_plot, create_journey_plot_line, make_unordered_list
+from utils import Header, create_feature_imp_plot, create_journey_plot_line, make_unordered_list, discrete_background_color_bins
 
 import pandas as pd
 import numpy as np
@@ -18,6 +19,10 @@ f = open(DATA_PATH.joinpath("aim.txt"), "r")
 aim = f.read()
 
 dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
+
+metriccols = ['Score', 'ParentScore', 'ImprovementParent', 'Benchmark', 'ImprovementBenchmark']
+for col in metriccols:
+    dfrunmaster[col] = dfrunmaster[col].apply(lambda x : round(x, 4))
 
 # ### find series of changes used in best run
 bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ExpID'].values[0]
@@ -153,6 +158,15 @@ def top_features_page(app, title=projectname):
             )
 
 def detailed_log_page(app, title=projectname):
+    cols = [
+        'ExpID', 'ParentID', 'Description', 'Status', 'Duration', 'Metric',
+        'Score', 'ParentScore', 'ImprovementParent', 'Benchmark', 'ImprovementBenchmark',
+        'Chosen'
+    ]
+    scorestyles, _ = discrete_background_color_bins(dfrunmaster, columns=['Score'])
+    impParentstyles, _ = discrete_background_color_bins(dfrunmaster, columns=['ImprovementParent'])
+    impBenchstyles, _ = discrete_background_color_bins(dfrunmaster, columns=['ImprovementBenchmark'])
+
     return  html.Div(
                 [
                     html.Div([Header(app, title)]),
@@ -161,6 +175,69 @@ def detailed_log_page(app, title=projectname):
                             html.H6("Detailed Log of Experiments",
                                     className="subtitle padded",
                             ),
+                            html.Br(),
+                            html.Br(),
+                            html.Br(),
+                            DataTable(
+                                id='detailed-log',
+                                columns=[{"name":i, "id":i} for i in cols],
+                                data=dfrunmaster[cols].to_dict('records'),
+                                page_size=15,
+                                style_cell_conditional=[
+                                    {
+                                        'if': {'column_id': c},
+                                        'textAlign': ('left' if c in ['ExpID', 'ParentID', 'Description'] else 'center')
+                                    } for c in cols
+                                ],
+                                style_data={'font-size' : '11px'},
+                                style_header={'font-size' : '11px', 'font-weight' : 'bold'},
+                                style_as_list_view=True,
+                                sort_action="native",
+                                sort_mode="multi",
+                                filter_action="native",
+                                style_data_conditional=[
+                                    {
+                                        'if': {
+                                            'filter_query': '{Status} = "Completed"',
+                                            'column_id' : 'Status'
+                                        },
+                                        'backgroundColor': '#228B22',
+                                        'color': 'white'
+                                    },
+                                    {
+                                        'if': {
+                                            'filter_query': '{Status} = "Failed"',
+                                            'column_id' : 'Status'
+                                        },
+                                        'backgroundColor': '#FF6347',
+                                        'color': 'white'
+                                    },
+                                    {
+                                        'if': {
+                                            'filter_query': '{Status} = "Running"',
+                                            'column_id' : 'Status'
+                                        },
+                                        'backgroundColor': '#FFFF66',
+                                        'color': 'black'
+                                    },
+                                    {
+                                        'if': {
+                                            'filter_query': '{Chosen} = "1"',
+                                            'column_id' : 'Chosen'
+                                        },
+                                        'backgroundColor': '#228B22',
+                                        'color': 'white'
+                                    },
+                                    {
+                                        'if': {
+                                            'filter_query': '{Chosen} = "0"',
+                                            'column_id' : 'Chosen'
+                                        },
+                                        'backgroundColor': '#FF6347',
+                                        'color': 'white'
+                                    }
+                                ] + impParentstyles + scorestyles + impBenchstyles
+                            )
                         ],
                         className="sub_page",
                     )
