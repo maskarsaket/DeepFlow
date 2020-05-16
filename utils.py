@@ -15,14 +15,14 @@ def get_header(app, projectname):
                 [
                     html.Br(),
                     html.Br(),
-                    html.Br()                   
+                    html.Br()
                 ],
                 className="row",
             ),
             html.Div(
                 [
                     html.Div(
-                        [html.H5(projectname)], 
+                        [html.H5(projectname)],
                         className="seven columns main-title",
                     ),
                     # html.Div(
@@ -55,7 +55,7 @@ def make_unordered_list(arr):
         html.Ul([html.Li(x) for x in arr]),
         className="padded"
     )
-    
+
 def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
     return  dcc.Graph(
                 # id=graphid,
@@ -79,10 +79,10 @@ def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
                     "layout": go.Layout(
                         autosize=True,
                         bargap=0.35,
-                        font={"family": "Raleway", "size": 11},
-                        height=300,
+                        font={"family": "Raleway", "size": 14},
+                        height=400,
                         hovermode="y",
-                        hoverlabel={"font_family": "Raleway", "font_size": 11},
+                        hoverlabel={"font_family": "Raleway", "font_size": 14},
                         margin={
                             "r": 0,
                             "t": 20,
@@ -110,80 +110,6 @@ def create_feature_imp_plot(df, graphid, text, hovertemplate="Count : %{text}"):
                 config={"displayModeBar": False},
             )
 
-def create_journey_plot_new(dfrunmaster):
-    fig = px.line(
-            data_frame=dfrunmaster[dfrunmaster.Chosen==1],
-            x="ExpID",
-            y="Score", 
-            color="ScoreType",
-            hover_data = ["Description"]            
-        )
-    
-    fig.add_trace(
-        go.Scatter(
-            x=dfrunmaster[dfrunmaster.Chosen==0]['ExpID'],
-            y=dfrunmaster[dfrunmaster.Chosen==0]['Score'],
-            text=dfrunmaster[dfrunmaster.Chosen==0]['Description'],
-            mode="markers",
-            name="Not Chosen",
-            hovertemplate= "Exp%{x}<br>%{text}<br>" + "Score : %{y}"
-        )
-    )
-
-    fig.update_layout(
-        go.Layout(
-                autosize=True,
-                title="",
-                font={"family": "Raleway", "size": 11},
-                height=250,
-                # width=340,
-                hovermode="closest",
-                hoverlabel={"font_family": "Raleway", "font_size": 11},
-                legend={
-                    "x": -0.0277108433735,
-                    "y": -0.142606516291,
-                    "orientation": "h",
-                },
-                margin={
-                    "r": 20,
-                    "t": 20,
-                    "b": 20,
-                    "l": 50,
-                },
-                showlegend=True,
-                xaxis={
-                    "autorange": True,
-                    "linecolor": "rgb(0, 0, 0)",
-                    "linewidth": 1,
-                    "showgrid": False,
-                    "showline": True,
-                    "title": "",
-                    # "type": "linear",
-                    "zeroline" : False
-                },
-                yaxis={
-                    "autorange": True,
-                    "gridcolor": "rgba(127, 127, 127, 0.2)",
-                    "mirror": False,
-                    "nticks": 4,
-                    "showgrid": True,
-                    "showline": True,
-                    "ticklen": 10,
-                    "ticks": "outside",
-                    "title": "Score",
-                    "type": "linear",
-                    "zeroline": False,
-                    "zerolinewidth": 4,
-                },
-            )
-    )
-
-    return dcc.Graph(
-            id="graph-2",
-            figure=fig,
-            config={"displayModeBar": False},
-        )
-
 def create_journey_plot_line(dfrunmaster):
     figure = go.Figure()
 
@@ -210,16 +136,16 @@ def create_journey_plot_line(dfrunmaster):
             hovertemplate="Benchmark %{y}"
         )
     ])
-    
+
     figure.update_layout(
         go.Layout(
             autosize=True,
             title="",
-            font={"family": "Raleway", "size": 11},
-            height=250,
+            font={"family": "Raleway", "size": 14},
+            height=320,
             # width=340,
             hovermode="closest",
-            hoverlabel={"font_family": "Raleway", "font_size": 11},
+            hoverlabel={"font_family": "Raleway", "font_size": 14},
             legend={
                 "x": -0.0277108433735,
                 "y": -0.142606516291,

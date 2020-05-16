@@ -33,7 +33,7 @@ dfrunmaster['Chosen'] = [1 if i in bestruns else 0 for i in dfrunmaster.ExpID]
 
 projectname = dfrunmaster['ProjectName'].unique()[0]
 
-### TODO : Sort values based on Acc/Error col in runmaster 
+### TODO : Sort values based on Acc/Error col in runmaster
 topruns = dfrunmaster.sort_values(by='Score').head(5)
 toprunparams = topruns['Params'].dropna()
 topfeatures = pd.DataFrame()
@@ -69,8 +69,7 @@ def create_layout(app,projectname=projectname):
                         [
                             html.Div(
                                 [
-                                    html.H6(aim,
-                                        style={"color": "#ffffff"},
+                                    html.H6(aim,                                        
                                         className="row",
                                     ),
                                 ],
@@ -86,21 +85,21 @@ def create_layout(app,projectname=projectname):
                                         "Journey Plot",
                                         className="subtitle padded",
                                     ),
-                                    create_journey_plot_line(dfrunmaster),                                    
+                                    create_journey_plot_line(dfrunmaster),
                                 ],
                                 className="seven columns",
                             ),
                             html.Div(
                                 [
                                     html.H6(
-                                        "Key Takeaways", 
+                                        "Key Takeaways",
                                         className="subtitle padded"
                                     ),
                                     html.Div(id='table_learnings'),
                                     html.Div([
-                                        dcc.Input(id='input_journey', type='text', placeholder='Enter new learnings'),  
+                                        dcc.Input(id='input_journey', type='text', placeholder='Enter new learnings'),
                                         html.Button('Add', id='submit_learning', n_clicks=0)
-                                    ],className="row")                     
+                                    ],className="row")
                                 ],
                                 className="five columns",
                             ),
@@ -115,14 +114,14 @@ def create_layout(app,projectname=projectname):
                                         "Observations from Features",
                                         className="subtitle padded",
                                     ),
-                                    html.Div(id='feature_observations'),                                    
+                                    html.Div(id='feature_observations'),
                                     html.Div([
-                                        dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),  
+                                        dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),
                                         html.Button('Add', id='submit_observation', n_clicks=0)
                                     ],className="row")
                                 ],
                                 className="five columns",
-                            ),                            
+                            ),
                             html.Div(
                                 [
                                     html.H6(
@@ -150,7 +149,7 @@ def create_layout(app,projectname=projectname):
                             html.Div(
                                 [
                                     html.H6(
-                                        "Changes that dint help", 
+                                        "Changes that dint help",
                                         className="subtitle padded"
                                     ),
                                     make_unordered_list(dfrunmaster[dfrunmaster.Chosen==0]['Description'].values),
