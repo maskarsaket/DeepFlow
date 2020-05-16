@@ -144,7 +144,7 @@ def create_journey_plot_line(dfrunmaster):
             font={"family": "Raleway", "size": 14},
             height=320,
             # width=340,
-            hovermode="closest",
+            hovermode="x",
             hoverlabel={"font_family": "Raleway", "font_size": 14},
             legend={
                 "x": -0.0277108433735,

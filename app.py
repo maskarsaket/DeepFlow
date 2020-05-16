@@ -17,21 +17,16 @@ app = dash.Dash(
 server = app.server
 
 # Describe the layout/ UI of the app
-app.layout = html.Div(
-    tuple(overview.create_layout(app) if i==0 else details.create_layout(app, i) for i in range(50))
+app.layout = html.Div([
+        overview.new_first_page(app),
+        overview.journey_page(app),
+        overview.top_features_page(app),
+        overview.detailed_log_page(app)
+        # tuple( if i==0 else details.create_layout(app, i) for i in range(50))
+    ]
 )
 
-# Update learnings
-@app.callback(Output("table_learnings", "children"), [Input("submit_learning", "n_clicks")], [State('input_journey', 'value')])
-def update_learnings(n_clicks, value):
-    learning = pd.read_csv('../Artefacts/Overview/learnings.csv')
-    if n_clicks > 0:
-        newlearning = pd.DataFrame({'Learnings':[value]})
-        learning = pd.concat([learning, newlearning], axis=0)
-        learning.to_csv('../Artefacts/Overview/learnings.csv', index=False)
-    return make_unordered_list(learning['Learnings'].values)
-
-# Update feature observations
+# # Update feature observations
 @app.callback(Output("feature_observations", "children"), [Input("submit_observation", "n_clicks")], [State('input_observation', 'value')])
 def update_observations(n_clicks, value):
     observations = pd.read_csv('../Artefacts/Overview/observations.csv')

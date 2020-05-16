@@ -58,28 +58,34 @@ if topfeatures.shape[0] != 0:
     topfeatures.sort_values(by='importance', ascending=True, inplace=True)
 
 
-def create_layout(app,projectname=projectname):
-    # Page layouts
-    return html.Div(
-        [
-            html.Div([Header(app, projectname)]),
-            html.Div(
+def new_first_page(app, title=projectname):
+    return  html.Div(
                 [
+                    html.Div([Header(app, title)]),
                     html.Div(
                         [
                             html.Div(
                                 [
-                                    html.H6(aim,                                        
+                                    html.H6(aim,
                                         className="row",
                                     ),
                                 ],
                                 className="product",
                             )
                         ],
-                        className="row",
-                    ),
+                        className="sub_page",
+                    )
+                ],
+                className="page"
+            )
+
+def journey_page(app, title=projectname):
+    return  html.Div(
+                [
+                    html.Div([Header(app, title)]),
                     html.Div(
-                        [html.Div(
+                        [
+                            html.Div(
                                 [
                                     html.H6(
                                         "Journey Plot",
@@ -92,36 +98,26 @@ def create_layout(app,projectname=projectname):
                             html.Div(
                                 [
                                     html.H6(
-                                        "Key Takeaways",
-                                        className="subtitle padded"
+                                        "Road to best model",
+                                        className="subtitle padded",
                                     ),
-                                    html.Div(id='table_learnings'),
-                                    html.Div([
-                                        dcc.Input(id='input_journey', type='text', placeholder='Enter new learnings'),
-                                        html.Button('Add', id='submit_learning', n_clicks=0)
-                                    ],className="row")
+                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==1]['Description'].values),
                                 ],
                                 className="five columns",
                             ),
                         ],
-                        className="row",
-                    ),
+                        className="sub_page",
+                    )
+                ],
+                className="page"
+            )
+
+def top_features_page(app, title=projectname):
+        return  html.Div(
+                [
+                    html.Div([Header(app, title)]),
                     html.Div(
                         [
-                            html.Div(
-                                [
-                                    html.H6(
-                                        "Observations from Features",
-                                        className="subtitle padded",
-                                    ),
-                                    html.Div(id='feature_observations'),
-                                    html.Div([
-                                        dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),
-                                        html.Button('Add', id='submit_observation', n_clicks=0)
-                                    ],className="row")
-                                ],
-                                className="five columns",
-                            ),
                             html.Div(
                                 [
                                     html.H6(
@@ -132,36 +128,42 @@ def create_layout(app,projectname=projectname):
                                 ],
                                 className="seven columns",
                             ),
-                        ],
-                        className="row ",
-                    ),
-                    html.Div(
-                        [html.Div(
-                                [
-                                    html.H6(
-                                        "Road to best model",
-                                        className="subtitle padded",
-                                    ),
-                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==1]['Description'].values),
-                                ],
-                                className="seven columns",
-                            ),
                             html.Div(
                                 [
                                     html.H6(
-                                        "Changes that dint help",
-                                        className="subtitle padded"
+                                        "Observations",
+                                        className="subtitle padded",
                                     ),
-                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==0]['Description'].values),
+                                    html.Div(id='feature_observations'),
+                                    html.Div(
+                                        [
+                                            dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),
+                                            html.Button('Add', id='submit_observation', n_clicks=0)
+                                        ],
+                                        className="row"
+                                    )
                                 ],
                                 className="five columns",
                             ),
                         ],
-                        className="row",
+                        className="sub_page",
                     )
                 ],
-                className="sub_page",
-            ),
-        ],
-        className="page",
-    )
+                className="page"
+            )
+
+def detailed_log_page(app, title=projectname):
+    return  html.Div(
+                [
+                    html.Div([Header(app, title)]),
+                    html.Div(
+                        [
+                            html.H6("Detailed Log of Experiments",
+                                    className="subtitle padded",
+                            ),
+                        ],
+                        className="sub_page",
+                    )
+                ],
+                className="page"
+            )
