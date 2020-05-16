@@ -15,8 +15,8 @@ body {
 }
 .page {
   position: relative;
-  width: 210mm;
-  min-height: 300mm;
+  width: 338mm;
+  min-height: 190mm;
   padding: 0mm;
   margin: 10mm auto;
   /* border: 1px #D3D3D3 solid; */
@@ -27,7 +27,7 @@ body {
 .subpage {
   padding: 1cm;
   border: 5px #ccc solid;
-  height: 257mm;
+  height: 190mm;
   outline: 2cm whitesmoke solid;
 }
 
@@ -38,8 +38,8 @@ body {
 @media print {
   html,
   body {
-    width: 210mm;
-    height: 297mm;
+    width: 338mm;
+    height: 190mm;
   }
   .page {
     margin: 0;

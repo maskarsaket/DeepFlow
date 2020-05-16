@@ -27,7 +27,7 @@ def create_layout(app, ExpID, projectname=projectname):
 
         exppath = param['Artefacts']
         dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
-        
+
         if os.path.exists(f"{exppath}/importance.csv"):
             imp = pd.read_csv(f"{exppath}/importance.csv")
             imp.columns = [i.lower() for i in imp.columns]
@@ -56,7 +56,7 @@ def create_layout(app, ExpID, projectname=projectname):
                         className="row",
                     ),
                     html.Div(
-                        [                            
+                        [
                             html.Div(
                                 [
                                     html.H6(
