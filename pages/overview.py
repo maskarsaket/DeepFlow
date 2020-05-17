@@ -1,15 +1,16 @@
-import dash_core_components as dcc
-import dash_html_components as html
-from dash_table import DataTable
-import plotly.graph_objs as go
-
-from utils import Header, create_feature_imp_plot, create_journey_plot_line, make_unordered_list, discrete_background_color_bins
-
-import pandas as pd
-import numpy as np
-import pathlib
 import ast
 import os
+import pathlib
+
+import dash_core_components as dcc
+import dash_html_components as html
+import numpy as np
+import pandas as pd
+import plotly.graph_objs as go
+from dash_table import DataTable
+
+from utils import (Header, create_feature_imp_plot, create_journey_plot_line,
+                   discrete_background_color_bins, make_unordered_list)
 
 # get relative data folder
 PATH = pathlib.Path(__file__).parent
@@ -20,13 +21,15 @@ aim = f.read()
 
 dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
 
-metriccols = ['Score', 'ParentScore', 'ImprovementParent', 'Benchmark', 'ImprovementBenchmark']
+metriccols = ['Score', 'ParentScore', 'ImprovementParent',
+              'Benchmark', 'ImprovementBenchmark']
 for col in metriccols:
     dfrunmaster[col] = dfrunmaster[col].apply(lambda x : round(x, 4))
 
 # ### find series of changes used in best run
-bestexp = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ExpID'].values[0]
-parent = dfrunmaster[(dfrunmaster.Score==min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score))]['ParentID'].values[0]
+bestScore = min(dfrunmaster[(dfrunmaster.Metric=='Average RMSE')].Score)
+bestexp = dfrunmaster[dfrunmaster.Score==bestScore]['ExpID'].values[0]
+parent = dfrunmaster[dfrunmaster.Score==bestScore]['ParentID'].values[0]
 bestruns = [bestexp]
 
 while not np.isnan(parent):
@@ -71,7 +74,15 @@ def new_first_page(app, title=projectname):
                         [
                             html.Div(
                                 [
-                                    html.H6(aim,
+                                    html.H6(f"Objective : {aim}",
+                                        className="row",
+                                    ),
+                                ],
+                                className="product",
+                            ),
+                            html.Div(
+                                [
+                                    html.H6("Success Criteria",
                                         className="row",
                                     ),
                                 ],
@@ -85,6 +96,7 @@ def new_first_page(app, title=projectname):
             )
 
 def journey_page(app, title=projectname):
+    chosenChanges = dfrunmaster[dfrunmaster.Chosen==1]['Description'].values
     return  html.Div(
                 [
                     html.Div([Header(app, title)]),
@@ -106,7 +118,7 @@ def journey_page(app, title=projectname):
                                         "Road to best model",
                                         className="subtitle padded",
                                     ),
-                                    make_unordered_list(dfrunmaster[dfrunmaster.Chosen==1]['Description'].values),
+                                    make_unordered_list(chosenChanges),
                                 ],
                                 className="five columns",
                             ),
@@ -129,7 +141,12 @@ def top_features_page(app, title=projectname):
                                         f"Top Features - across top {featruns} runs",
                                         className="subtitle padded",
                                     ),
-                                    create_feature_imp_plot(topfeatures, "graph-1", topfeatures['count'], "<b>Importance : %{x}<br>" + "Count : %{text}"),
+                                    create_feature_imp_plot(
+                                        topfeatures,
+                                        "graph-1",
+                                        topfeatures['count'],
+                                        "<b>Importance : %{x}<br>" + "Count : %{text}"
+                                    ),
                                 ],
                                 className="seven columns",
                             ),
@@ -142,8 +159,16 @@ def top_features_page(app, title=projectname):
                                     html.Div(id='feature_observations'),
                                     html.Div(
                                         [
-                                            dcc.Input(id='input_observation', type='text', placeholder='Enter new observations'),
-                                            html.Button('Add', id='submit_observation', n_clicks=0)
+                                            dcc.Input(
+                                                id='input_observation',
+                                                type='text',
+                                                placeholder='Enter new observations'
+                                            ),
+                                            html.Button(
+                                                'Add',
+                                                id='submit_observation',
+                                                n_clicks=0
+                                            )
                                         ],
                                         className="row"
                                     )
@@ -159,9 +184,9 @@ def top_features_page(app, title=projectname):
 
 def detailed_log_page(app, title=projectname):
     cols = [
-        'ExpID', 'ParentID', 'Description', 'Status', 'Duration', 'Metric',
-        'Score', 'ParentScore', 'ImprovementParent', 'Benchmark', 'ImprovementBenchmark',
-        'Chosen'
+        'ExpID', 'ParentID', 'Description', 'Status', 'Duration',
+        'Metric', 'Score', 'ParentScore', 'ImprovementParent',
+        'Benchmark', 'ImprovementBenchmark', 'Chosen'
     ]
     scorestyles, _ = discrete_background_color_bins(dfrunmaster, columns=['Score'])
     impParentstyles, _ = discrete_background_color_bins(dfrunmaster, columns=['ImprovementParent'])

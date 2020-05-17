@@ -21,13 +21,16 @@ app.layout = html.Div([
         overview.new_first_page(app),
         overview.journey_page(app),
         overview.top_features_page(app),
-        overview.detailed_log_page(app)
-        # tuple( if i==0 else details.create_layout(app, i) for i in range(50))
+        overview.detailed_log_page(app),
+        details.create_layout(app, 21)
+        # tuple(details.create_layout(app, i) for i in range(50))
     ]
 )
 
 # # Update feature observations
-@app.callback(Output("feature_observations", "children"), [Input("submit_observation", "n_clicks")], [State('input_observation', 'value')])
+@app.callback(Output("feature_observations", "children"),
+              [Input("submit_observation", "n_clicks")],
+              [State('input_observation', 'value')])
 def update_observations(n_clicks, value):
     observations = pd.read_csv('../Artefacts/Overview/observations.csv')
     if n_clicks > 0:
