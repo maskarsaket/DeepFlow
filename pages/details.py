@@ -1,17 +1,13 @@
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objs as go
-
-from utils import Header, make_dash_table, create_feature_imp_plot
-
-import pandas as pd
-import pathlib
 import ast
 import os
+import pathlib
 
-# get relative data folder
-PATH = pathlib.Path(__file__).parent
-DATA_PATH = PATH.joinpath("../data").resolve()
+import dash_core_components as dcc
+import dash_html_components as html
+import pandas as pd
+import plotly.graph_objs as go
+
+from utils import Header, create_feature_imp_plot, make_dash_table
 
 dfrunmaster = pd.read_csv('../Artefacts/Overview/runmaster.csv')
 projectname = dfrunmaster['ProjectName'].unique()[0]
@@ -63,7 +59,12 @@ def create_layout(app, ExpID, projectname=projectname):
                                         f"Top 10 Features",
                                         className="subtitle padded",
                                     ),
-                                    create_feature_imp_plot(topfeatures, "graph-4", topfeatures['importance'], "<b>Importance : %{x:.02f}")
+                                    create_feature_imp_plot(
+                                        topfeatures,
+                                        "graph-4",
+                                        topfeatures['importance'],
+                                        "<b>Importance : %{x:.02f}"
+                                    )
                                 ],
                                 className="seven columns",
                             ),
