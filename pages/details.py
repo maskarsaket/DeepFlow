@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.graph_objs as go
+from dash_table import DataTable
 
 from utils import Header, create_feature_imp_plot, make_dash_table
 
@@ -22,7 +23,11 @@ def create_layout(app, ExpID, projectname=projectname):
         param = ast.literal_eval(param)
 
         exppath = param['Artefacts']
-        dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
+        if os.path.exists(f"{exppath}/observations.csv"):
+            dffeatobs = pd.read_csv(f"{exppath}/observations.csv")
+        else:
+            dffeatobs = pd.DataFrame({'Observations' : []})
+            dffeatobs.to_csv(f"{exppath}/observations.csv", index=False)
 
         if os.path.exists(f"{exppath}/importance.csv"):
             imp = pd.read_csv(f"{exppath}/importance.csv")
@@ -74,7 +79,19 @@ def create_layout(app, ExpID, projectname=projectname):
                                         "Observations from Features",
                                         className="subtitle padded",
                                     ),
-                                    html.Table(make_dash_table(dffeatobs)),
+                                    DataTable(
+                                        id=f'feature_observations_exp{ExpID}',
+                                        columns=[{"name":'Observations', "id":'Observations'}],
+                                        data=dffeatobs.to_dict('records'),
+                                        style_data={'font-size' : '11px'},
+                                        style_header={'font-size' : '11px', 'font-weight' : 'bold'},
+                                        style_as_list_view=True,
+                                        editable=True,
+                                        row_deletable=True
+                                    ),
+                                    html.Button('Add Row', id='editing-rows-button', n_clicks=0),
+                                    html.Button(id="save-button",n_clicks=0,children="Save"),
+                                    html.Div(id="output-1",children="Press button to save changes")
                                 ],
                                 className="five columns",
                             ),
